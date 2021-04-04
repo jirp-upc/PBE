@@ -1,45 +1,43 @@
 require "gtk3"
 require_relative 'primer_puzzle.rb'
+require_relative 'widget_options.rb'
 
-@message ="Please, login with your university card"
-# Initial code without using classes
-rf = Rfid.new
+rf = Rfid.new                                                         #Objecte únic RFID
 
 def scan_tag(rf, info_label)
-  thr = Thread.new {
-    uid =  rf.read_uid
-    puts "Tag detected: " + uid
-    info_label.set_markup("uid: " + uid)
+  thr = Thread.new {                                                  #Fil auxiliar bloquejant per llegir RFID
+    uid =  rf.read_uid                                                #Lectura 
+    puts "Tag detected: " + uid                                       #Mostrem UID per command-prompt.
+    info_label.set_markup("uid: " + uid)                              #Mostrem UID per pantalla.
+    info_label.override_background_color(0, Gdk::RGBA::new(1,0,0,1))  #Modificació a color vermell de l'etiqueta.
   }
 end
 
-# Widget definition:
-window = Gtk::Window.new("PBE project")
-window.border_width = 10
-window.title = "rfid_gtk.rb"
+#S'ha utilitzat el fitxer widget_options.rb, on tenim, de manera separada, 
+#les variables de configuració per una manipulació més senzilla.
 
-info_label = Gtk::Label.new(@message)
+window = get_window		#Finestra. Objecte gràfic que encapsula tots els objectes gràfics
+grid = get_grid			#Graella. Utilitat per organitzar objectes a la finestra
+info_label = get_label		#Etiqueta. Canvia de color i text segons estat de l'aplicació 
+clear_button = get_button	#Botó 'clear' (per tornar a llegir RFID)
 
-clear_button = Gtk::Button.new("Clear")
+#Afegir objectes a graella, determinant la seva posició.
+grid.attach(info_label,0,0,1,1)
+grid.attach(clear_button,0,1,1,1)
+window.set_window_position(:center) #Pantalla al centre
 
-layoutBox = Gtk::Box.new(:vertical,10)
-layoutBox.pack_start(info_label)
-layoutBox.pack_start(clear_button)
 
-
-# Signal detection section:
-clear_button.signal_connect("clicked") do
-  info_label.set_markup(@message)
-  scan_tag(rf, info_label)
+clear_button.signal_connect("clicked") do #Actuació en cas de accionar botó
+  reset_label(info_label)                 #Reestabliment blau i missatge
+  scan_tag(rf, info_label)                
 end
 
-window.signal_connect('destroy') { Gtk.main_quit }
+window.signal_connect('destroy') { Gtk.main_quit } #Botó de tancament pantalla gràfica, finalitza aplicació
 
 
 # Run Application
-window.add(layoutBox)
-window.show_all
-scan_tag(rf, info_label)
+window.add(grid) #Afegim graella amb etiqueta i botó a la finestra visible
+window.show_all  #Mostrem elements 
+scan_tag(rf, info_label) #Invoquem mètode d'escanejament per primer cop
 
-Gtk.main
-thr.join
+Gtk.main                  #Bucle gràfic
