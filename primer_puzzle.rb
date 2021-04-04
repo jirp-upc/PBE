@@ -5,13 +5,13 @@ class Rfid
 	
 	def read_uid
 		quedat = 1;
-		r = MFRC522.new
+		@@r = MFRC522.new
 		puts "Si us plau, introdueixi la seva targeta sobre el lector"
 		$stdout.flush
 		while(quedat==1) 
 			begin
-				r.picc_request(MFRC522::PICC_REQA) #Establiment de perifèric
-				uid_dec, que = r.picc_select           #Intent de lectura (pot llençar CommunicationError degut a timeout)
+				@@r.picc_request(MFRC522::PICC_REQA) #Establiment de perifèric
+				uid_dec, que = @@r.picc_select           #Intent de lectura (pot llençar CommunicationError degut a timeout)
 			rescue CommunicationError => e             #Capturem raising (si entra aquí s'està assolint timeout)...				           
 			else					   #Ha capturat uid. Sortim
 				quedat = 0			   
