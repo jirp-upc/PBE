@@ -4,10 +4,9 @@ require 'securerandom'
 #r variable declared as class variable to solve problems at segon_puzzle. Thank you, Marc Nueno. https://github.com/Marc-Nueno-Montolio ;)
 
 class Rfid
-	
+	@@r = MFRC522.new
 	def read_uid
 		quedat = 1;
-		@@r = MFRC522.new
 		puts "Si us plau, introdueixi la seva targeta sobre el lector"
 		$stdout.flush
 		while(quedat==1) 
